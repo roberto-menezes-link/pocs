@@ -1,4 +1,4 @@
-package com.link.apache.camel.demo.simpleroute;
+package com.link.apache.camel.demo.routes.rest;
 
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
@@ -24,20 +24,21 @@ public class SimpleRestApiRoute extends RouteBuilder {
                 .to("activemq:queue:errorMessageQueue")
                 .log("Sent to DLQ");
 
-        from("direct:callRoute1")
-                .log(LoggingLevel.DEBUG, "Starting process")
-                .log("Calling API 1...")
-                .to("https://linkmockapi.free.beeceptor.com/customers")
-                .log("Response from API 1: ${body}")
-                .process(new Api1ResponseProcessor())
-                .log("Calling API 2 with transformed data: ${body}")
-                .to(restApi2)
-                .log("Response from API 2: ${body}")
-                .process(new Api2ResponseProcessor())
-                .log("Sending message to ActiveMQ queue...")
-                .log("Message ${body}")
-                .to("activemq:queue:mainQueue")
-                .log("Message sent to ActiveMQ successfully");
+        from("direct:rest2rest")
+            .routeId("rest2rest")
+            .log(LoggingLevel.DEBUG, "Starting process")
+            .log("Calling API 1...")
+            .to("https://linkmockapi.free.beeceptor.com/customers")
+            .log("Response from API 1: ${body}")
+            .process(new Api1ResponseProcessor())
+            .log("Calling API 2 with transformed data: ${body}")
+            .to(restApi2)
+            .log("Response from API 2: ${body}")
+            .process(new Api2ResponseProcessor())
+            .log("Sending message to ActiveMQ queue...")
+            .log("Message ${body}")
+            .to("activemq:queue:mainQueue")
+            .log("Message sent to ActiveMQ successfully");
 
     }
 }

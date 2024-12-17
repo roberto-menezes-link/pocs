@@ -1,4 +1,4 @@
-package com.link.apache.camel.demo.simpleroute;
+package com.link.apache.camel.demo.routes.rest;
 
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.link.apache.camel.demo.model.Customer;
@@ -9,15 +9,16 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 
 @Component
-public class Api2ResponseProcessor implements Processor {
+public class Api1ResponseProcessor implements Processor {
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        String transformedData = exchange.getIn().getBody(String.class);
+        String api1Response = exchange.getIn().getBody(String.class);
         JsonMapper mapper = new JsonMapper();
-        Customer customer = mapper.readValue(transformedData, (Customer.class));
-        customer.setBalance(new BigDecimal(150));
+        Customer customer = mapper.readValue(api1Response, (Customer.class));
+        customer.setBalance(new BigDecimal(50));
         String jsonString = mapper.writeValueAsString(customer);
         exchange.getIn().setBody(jsonString);
+        exchange.getIn().setHeader("API1Result", jsonString);
     }
 }
