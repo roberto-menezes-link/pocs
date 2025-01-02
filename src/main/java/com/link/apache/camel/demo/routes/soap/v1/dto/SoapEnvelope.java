@@ -1,4 +1,4 @@
-package com.link.apache.camel.demo.routes.soap.dto;
+package com.link.apache.camel.demo.routes.soap.v1.dto;
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 

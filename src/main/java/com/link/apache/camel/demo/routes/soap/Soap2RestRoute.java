@@ -12,13 +12,7 @@ public class Soap2RestRoute extends RouteBuilder {
     public void configure() {
         from("direct:soap2rest")
             .routeId("soap2rest")
-            .process(exchange -> {
-                    String initialSoapRequest = buildSoapRequest("anyId");
-                    exchange.getIn().setBody(initialSoapRequest);
-                })
-            .setHeader("Content-Type", constant("text/xml"))
-            .to("http://eaa86977-f80b-4c94-bef4-335ca7a8d899.mock.pstmn.io/balance")
-            .log("SOAP response processed: ${body}")
+            .removeHeaders("*")
             .process(exchange -> exchange.getIn().setBody(null))
             .to("https://linkmockapi.free.beeceptor.com/customers")
             .log("body from REST: ${body}")
@@ -27,21 +21,7 @@ public class Soap2RestRoute extends RouteBuilder {
                     JsonMapper mapper = new JsonMapper();
                     Customer customer = mapper.readValue(api1Response, (Customer.class));
 
-                    String soapRequest = buildSoapRequest(customer.getId());
-                    exchange.getIn().setBody(soapRequest);
+                    exchange.getIn().setBody(customer.getName() + "-Rest");
                 });
-    }
-
-    private String buildSoapRequest(String id) {
-        return """
-                    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org/">
-                          <soapenv:Header/>
-                          <soapenv:Body>
-                             <tem:Balance>
-                                <tem:id>%s</tem:id>
-                             </tem:Balance>
-                          </soapenv:Body>
-                       </soapenv:Envelope>
-                """.formatted(id);
     }
 }
